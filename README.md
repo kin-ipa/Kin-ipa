@@ -1,4 +1,4 @@
-## Hi there 👋 hh
+## Hi there 
 
 <!--
 **kin-ipa/Kin-ipa** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
