@@ -3,175 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>معدل ملفات IPA - تعديل البندل والاسم</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>متجر تطبيقات IPA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+
+        .app-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .app-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            object-fit: cover;
+            border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .app-title {
+            flex: 1;
+        }
+
+        .app-name {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .app-category {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+
+        .app-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .app-details {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 0.95em;
+        }
+
+        .detail-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .detail-value {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .download-btn {
+            display: inline-block;
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .download-btn:active {
+            transform: scale(0.98);
+        }
+
+        .developer-info {
+            margin-top: 10px;
+            text-align: left;
+            font-size: 0.85em;
+            color: #888;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        /* تنسيق للهواتف المحمولة */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .app-card {
+                padding: 15px;
+            }
+            
+            .app-icon {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .app-name {
+                font-size: 1.2em;
+            }
+        }
+
+        /* شريط البحث */
+        .search-bar {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            max-width: 500px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        /* رسالة عند عدم وجود نتائج */
+        .no-results {
+            text-align: center;
+            color: white;
+            font-size: 1.5em;
+            padding: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            margin: 20px;
+        }
+
+        /* تذييل الصفحة */
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            padding: 20px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>✧ معدل ملفات IPA ✧</h1>
-            <p class="subtitle">تعديل Bundle Identifier واسم التطبيق بسهولة</p>
-        </header>
+        <h1>📱 متجر تطبيقات IPA</h1>
+        
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="🔍 ابحث عن تطبيق..." id="searchInput">
+        </div>
 
-        <div class="main-content">
-            <div class="upload-section">
-                <form id="uploadForm" enctype="multipart/form-data" method="POST" action="upload.php">
-                    <div class="file-upload">
-                        <div class="file-upload-icon">📦</div>
-                        <h3>اختر ملف IPA</h3>
-                        <p>اسحب الملف أو انقر للاختيار</p>
-                        <input type="file" name="ipa_file" id="ipa_file" accept=".ipa" required>
-                        <div class="file-info" id="fileInfo"></div>
-                    </div>
-
-                    <div class="modification-options" style="display: none;" id="modOptions">
-                        <h3>خيارات التعديل</h3>
-                        
-                        <div class="info-plist-preview" id="plistPreview">
-                            <h4>معلومات التطبيق الحالية</h4>
-                            <div class="plist-data" id="plistData"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="bundle_id">Bundle Identifier الجديد:</label>
-                            <input type="text" id="bundle_id" name="bundle_id" 
-                                   placeholder="مثال: com.example.app" dir="ltr">
-                            <small>اترك فارغاً إذا لم ترد التغيير</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="app_name">اسم التطبيق الجديد:</label>
-                            <input type="text" id="app_name" name="app_name" 
-                                   placeholder="اسم التطبيق الجديد">
-                            <small>اترك فارغاً إذا لم ترد التغيير</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="display_name">اسم العرض الجديد (CFBundleDisplayName):</label>
-                            <input type="text" id="display_name" name="display_name" 
-                                   placeholder="اسم العرض">
-                            <small>اختياري - اسم يظهر تحت الأيقونة</small>
-                        </div>
-
-                        <button type="submit" class="btn-submit" id="submitBtn">
-                            ✦ تعديل وتحميل ✦
-                        </button>
-                    </div>
-                </form>
-
-                <div class="progress-section" id="progressSection" style="display: none;">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
-                    <p id="progressMessage">جاري المعالجة...</p>
-                </div>
-
-                <div class="result-section" id="resultSection" style="display: none;">
-                    <div class="result-icon">✓</div>
-                    <h3>تم التعديل بنجاح!</h3>
-                    <a href="#" id="downloadLink" class="download-btn">تحميل الملف المعدل</a>
-                    <button onclick="location.reload()" class="new-file-btn">تعديل ملف آخر</button>
-                </div>
-
-                <div class="error-section" id="errorSection" style="display: none;">
-                    <div class="error-icon">✗</div>
-                    <h3>حدث خطأ</h3>
-                    <p id="errorMessage"></p>
-                    <button onclick="location.reload()" class="new-file-btn">حاول مرة أخرى</button>
-                </div>
-            </div>
-
-            <div class="info-section">
-                <h3>ℹ️ معلومات</h3>
-                <ul>
-                    <li><strong>Bundle Identifier:</strong> معرف فريد للتطبيق</li>
-                    <li><strong>اسم التطبيق:</strong> الاسم الرئيسي للتطبيق</li>
-                    <li><strong>اسم العرض:</strong> الاسم الذي يظهر تحت الأيقونة</li>
-                </ul>
-                <div class="warning">
-                    ⚠️ ملاحظة: التعديل قد يؤثر على توقيع التطبيق وقد لا يعمل على الأجهزة غير المجالة
-                </div>
-            </div>
+        <div class="apps-grid" id="appsContainer"></div>
+        
+        <div class="footer">
+            <p>جميع الحقوق محفوظة © 2024 | تحميل تطبيقات IPA المباشر</p>
+            <p style="font-size: 0.8em; margin-top: 10px;">روابط التحميل المستخدمة للعرض فقط</p>
         </div>
     </div>
 
+    <!-- تحميل ملف البيانات -->
+    <script src="data.js"></script>
+    
     <script>
-        document.getElementById('ipa_file').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('fileInfo').innerHTML = `
-                    <div class="file-selected">
-                        <strong>الملف المختار:</strong> ${file.name}<br>
-                        <strong>الحجم:</strong> ${(file.size / (1024*1024)).toFixed(2)} MB
+        // عناصر DOM
+        const appsContainer = document.getElementById('appsContainer');
+        const searchInput = document.getElementById('searchInput');
+
+        // دالة عرض التطبيقات
+        function displayApps(apps) {
+            if (apps.length === 0) {
+                appsContainer.innerHTML = '<div class="no-results">❌ لا توجد تطبيقات متطابقة</div>';
+                return;
+            }
+
+            appsContainer.innerHTML = apps.map(app => `
+                <div class="app-card">
+                    <div class="app-header">
+                        <img src="${app.iconUrl}" alt="${app.name}" class="app-icon" onerror="this.src='https://via.placeholder.com/100/cccccc/ffffff?text=App'">
+                        <div class="app-title">
+                            <div class="app-name">${app.name}</div>
+                            <span class="app-category">${app.category}</span>
+                        </div>
                     </div>
-                `;
-                
-                // رفع الملف لقراءة الـ plist
-                const formData = new FormData();
-                formData.append('ipa_file', file);
-                
-                fetch('upload.php?action=read', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('modOptions').style.display = 'block';
-                        document.getElementById('plistData').innerHTML = `
-                            <div class="plist-item"><span>البundle الحالي:</span> ${data.current_bundle}</div>
-                            <div class="plist-item"><span>الاسم الحالي:</span> ${data.current_name}</div>
-                            <div class="plist-item"><span>اسم العرض:</span> ${data.current_display_name || 'غير محدد'}</div>
-                            <div class="plist-item"><span>الإصدار:</span> ${data.version || 'غير معروف'}</div>
-                        `;
-                        
-                        document.getElementById('bundle_id').placeholder = data.current_bundle;
-                        document.getElementById('app_name').placeholder = data.current_name;
-                        document.getElementById('display_name').placeholder = data.current_display_name || data.current_name;
-                    } else {
-                        showError('فشل في قراءة معلومات التطبيق');
-                    }
-                })
-                .catch(error => {
-                    showError('حدث خطأ في رفع الملف');
-                });
+                    
+                    <p class="app-description">${app.description}</p>
+                    
+                    <div class="app-details">
+                        <div class="detail-item">
+                            <span class="detail-label">📦 الحجم:</span>
+                            <span class="detail-value">${app.size}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">🔄 الإصدار:</span>
+                            <span class="detail-value">${app.version}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">👤 المطور:</span>
+                            <span class="detail-value">${app.developer}</span>
+                        </div>
+                    </div>
+                    
+                    <a href="${app.ipaUrl}" class="download-btn" download>
+                        📥 تحميل التطبيق (${app.size})
+                    </a>
+                    
+                    <div class="developer-info">
+                        ⚡ تحميل مباشر - رابط IPA
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // دالة البحث
+        function searchApps(searchTerm) {
+            if (!searchTerm) {
+                return appData;
+            }
+            
+            searchTerm = searchTerm.toLowerCase();
+            return appData.filter(app => 
+                app.name.toLowerCase().includes(searchTerm) ||
+                app.description.toLowerCase().includes(searchTerm) ||
+                app.category.toLowerCase().includes(searchTerm) ||
+                app.developer.toLowerCase().includes(searchTerm)
+            );
+        }
+
+        // حدث البحث
+        searchInput.addEventListener('input', (e) => {
+            const filteredApps = searchApps(e.target.value);
+            displayApps(filteredApps);
+        });
+
+        // عرض جميع التطبيقات عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            displayApps(appData);
+        });
+
+        // تنبيه عند محاولة تحميل ملف IPA (لأن الروابط وهمية)
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('download-btn')) {
+                e.preventDefault();
+                alert('⚠️ هذا رابط تجريبي للعرض فقط\nالرابط الفعلي: ' + e.target.href);
             }
         });
-
-        document.getElementById('uploadForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            
-            document.getElementById('progressSection').style.display = 'block';
-            document.getElementById('submitBtn').disabled = true;
-            
-            fetch('process.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('progressSection').style.display = 'none';
-                
-                if (data.success) {
-                    document.getElementById('resultSection').style.display = 'block';
-                    document.getElementById('downloadLink').href = data.download_url;
-                } else {
-                    showError(data.message || 'فشل في تعديل الملف');
-                }
-            })
-            .catch(error => {
-                document.getElementById('progressSection').style.display = 'none';
-                showError('حدث خطأ في الاتصال بالخادم');
-            });
-        });
-
-        function showError(message) {
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('errorSection').style.display = 'block';
-        }
     </script>
 </body>
 </html>
