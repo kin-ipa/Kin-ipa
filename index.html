@@ -1,50 +1,33 @@
+"}
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
 <title>IPA Editor</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-
 <style>
-
 body{
 font-family:Arial;
-background:#0f0f0f;
+background:#111;
 color:white;
 text-align:center;
 padding:40px;
 }
-
 .box{
 background:#1b1b1b;
 padding:30px;
-border-radius:12px;
-width:420px;
+border-radius:10px;
+width:400px;
 margin:auto;
 }
-
-input{
-width:90%;
+input,button{
 padding:10px;
 margin:10px;
-border-radius:6px;
-border:none;
+width:90%;
 }
-
 button{
-padding:10px 20px;
-margin:10px;
-border:none;
-border-radius:6px;
 background:#00c896;
+border:none;
 color:white;
-cursor:pointer;
 }
-
-button:hover{
-opacity:0.8;
-}
-
 </style>
 </head>
 
@@ -52,98 +35,23 @@ opacity:0.8;
 
 <div class="box">
 
-<h2>IPA Reader & Editor</h2>
+<h2>Upload IPA</h2>
 
-<input type="file" id="ipaFile" accept=".ipa">
+<form action="upload.php" method="post" enctype="multipart/form-data">
 
-<br>
+<input type="file" name="ipa">
 
-<button onclick="readIPA()">Read IPA</button>
+<input type="text" name="name" placeholder="App Name">
 
-<hr>
+<input type="text" name="bundle" placeholder="Bundle ID">
 
-<input id="appName" placeholder="App Name">
+<input type="text" name="version" placeholder="Version">
 
-<input id="bundleID" placeholder="Bundle ID">
+<button type="submit">Edit IPA</button>
 
-<input id="version" placeholder="Version">
-
-<br>
-
-<button onclick="downloadPlist()">Download Edited Info.plist</button>
-
-<pre id="status"></pre>
+</form>
 
 </div>
 
-<script>
-
-let plistContent="";
-
-async function readIPA(){
-
-let file=document.getElementById("ipaFile").files[0];
-
-if(!file){
-alert("Select IPA file");
-return;
-}
-
-let zip=await JSZip.loadAsync(file);
-
-let infoFile=null;
-
-zip.forEach(function(path,file){
-
-if(path.includes("Info.plist")){
-infoFile=file;
-}
-
-});
-
-if(!infoFile){
-document.getElementById("status").innerText="Info.plist not found";
-return;
-}
-
-plistContent=await infoFile.async("string");
-
-document.getElementById("status").innerText="IPA Loaded Successfully";
-
-let nameMatch=plistContent.match(/<key>CFBundleName</key>[\s\S]?<string>(.?)</string>/);
-let bundleMatch=plistContent.match(/<key>CFBundleIdentifier</key>[\s\S]?<string>(.?)</string>/);
-let versionMatch=plistContent.match(/<key>CFBundleShortVersionString</key>[\s\S]?<string>(.?)</string>/);
-
-if(nameMatch) document.getElementById("appName").value=nameMatch[1];
-if(bundleMatch) document.getElementById("bundleID").value=bundleMatch[1];
-if(versionMatch) document.getElementById("version").value=versionMatch[1];
-
-}
-
-function downloadPlist(){
-
-let name=document.getElementById("appName").value;
-let bundle=document.getElementById("bundleID").value;
-let version=document.getElementById("version").value;
-
-let edited=plistContent
-.replace(/(<key>CFBundleName</key>[\s\S]?<string>)(.?)(</string>)/,"$1"+name+"$3")
-.replace(/(<key>CFBundleIdentifier</key>[\s\S]?<string>)(.?)(</string>)/,"$1"+bundle+"$3")
-.replace(/(<key>CFBundleShortVersionString</key>[\s\S]?<string>)(.?)(</string>)/,"$1"+version+"$3");
-
-let blob=new Blob([edited],{type:"text/xml"});
-
-let a=document.createElement("a");
-
-a.href=URL.createObjectURL(blob);
-
-a.download="Info.plist";
-
-a.click();
-
-}
-
-</script>
-
 </body>
-</html>
+</htm
