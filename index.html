@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معدل ملفات IPA - تعديل البندل والاسم</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✧ معدل ملفات IPA ✧</h1>
+            <p class="subtitle">تعديل Bundle Identifier واسم التطبيق بسهولة</p>
+        </header>
+
+        <div class="main-content">
+            <div class="upload-section">
+                <form id="uploadForm" enctype="multipart/form-data" method="POST" action="upload.php">
+                    <div class="file-upload">
+                        <div class="file-upload-icon">📦</div>
+                        <h3>اختر ملف IPA</h3>
+                        <p>اسحب الملف أو انقر للاختيار</p>
+                        <input type="file" name="ipa_file" id="ipa_file" accept=".ipa" required>
+                        <div class="file-info" id="fileInfo"></div>
+                    </div>
+
+                    <div class="modification-options" style="display: none;" id="modOptions">
+                        <h3>خيارات التعديل</h3>
+                        
+                        <div class="info-plist-preview" id="plistPreview">
+                            <h4>معلومات التطبيق الحالية</h4>
+                            <div class="plist-data" id="plistData"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bundle_id">Bundle Identifier الجديد:</label>
+                            <input type="text" id="bundle_id" name="bundle_id" 
+                                   placeholder="مثال: com.example.app" dir="ltr">
+                            <small>اترك فارغاً إذا لم ترد التغيير</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="app_name">اسم التطبيق الجديد:</label>
+                            <input type="text" id="app_name" name="app_name" 
+                                   placeholder="اسم التطبيق الجديد">
+                            <small>اترك فارغاً إذا لم ترد التغيير</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="display_name">اسم العرض الجديد (CFBundleDisplayName):</label>
+                            <input type="text" id="display_name" name="display_name" 
+                                   placeholder="اسم العرض">
+                            <small>اختياري - اسم يظهر تحت الأيقونة</small>
+                        </div>
+
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            ✦ تعديل وتحميل ✦
+                        </button>
+                    </div>
+                </form>
+
+                <div class="progress-section" id="progressSection" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p id="progressMessage">جاري المعالجة...</p>
+                </div>
+
+                <div class="result-section" id="resultSection" style="display: none;">
+                    <div class="result-icon">✓</div>
+                    <h3>تم التعديل بنجاح!</h3>
+                    <a href="#" id="downloadLink" class="download-btn">تحميل الملف المعدل</a>
+                    <button onclick="location.reload()" class="new-file-btn">تعديل ملف آخر</button>
+                </div>
+
+                <div class="error-section" id="errorSection" style="display: none;">
+                    <div class="error-icon">✗</div>
+                    <h3>حدث خطأ</h3>
+                    <p id="errorMessage"></p>
+                    <button onclick="location.reload()" class="new-file-btn">حاول مرة أخرى</button>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>ℹ️ معلومات</h3>
+                <ul>
+                    <li><strong>Bundle Identifier:</strong> معرف فريد للتطبيق</li>
+                    <li><strong>اسم التطبيق:</strong> الاسم الرئيسي للتطبيق</li>
+                    <li><strong>اسم العرض:</strong> الاسم الذي يظهر تحت الأيقونة</li>
+                </ul>
+                <div class="warning">
+                    ⚠️ ملاحظة: التعديل قد يؤثر على توقيع التطبيق وقد لا يعمل على الأجهزة غير المجالة
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('ipa_file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('fileInfo').innerHTML = `
+                    <div class="file-selected">
+                        <strong>الملف المختار:</strong> ${file.name}<br>
+                        <strong>الحجم:</strong> ${(file.size / (1024*1024)).toFixed(2)} MB
+                    </div>
+                `;
+                
+                // رفع الملف لقراءة الـ plist
+                const formData = new FormData();
+                formData.append('ipa_file', file);
+                
+                fetch('upload.php?action=read', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('modOptions').style.display = 'block';
+                        document.getElementById('plistData').innerHTML = `
+                            <div class="plist-item"><span>البundle الحالي:</span> ${data.current_bundle}</div>
+                            <div class="plist-item"><span>الاسم الحالي:</span> ${data.current_name}</div>
+                            <div class="plist-item"><span>اسم العرض:</span> ${data.current_display_name || 'غير محدد'}</div>
+                            <div class="plist-item"><span>الإصدار:</span> ${data.version || 'غير معروف'}</div>
+                        `;
+                        
+                        document.getElementById('bundle_id').placeholder = data.current_bundle;
+                        document.getElementById('app_name').placeholder = data.current_name;
+                        document.getElementById('display_name').placeholder = data.current_display_name || data.current_name;
+                    } else {
+                        showError('فشل في قراءة معلومات التطبيق');
+                    }
+                })
+                .catch(error => {
+                    showError('حدث خطأ في رفع الملف');
+                });
+            }
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            document.getElementById('progressSection').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+            
+            fetch('process.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('progressSection').style.display = 'none';
+                
+                if (data.success) {
+                    document.getElementById('resultSection').style.display = 'block';
+                    document.getElementById('downloadLink').href = data.download_url;
+                } else {
+                    showError(data.message || 'فشل في تعديل الملف');
+                }
+            })
+            .catch(error => {
+                document.getElementById('progressSection').style.display = 'none';
+                showError('حدث خطأ في الاتصال بالخادم');
+            });
+        });
+
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorSection').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
